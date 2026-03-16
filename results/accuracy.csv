@@ -1,7 +1,0 @@
-method,correct,total,accuracy
-chain_of_thought,5,5,1.000
-debate,4,5,0.800
-few_shot,5,5,1.000
-one_shot,5,5,1.000
-self_consistency,5,5,1.000
-zero_shot,4,5,0.800

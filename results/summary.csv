@@ -1,6 +1,0 @@
-qid,question,ground_truth,debate_verdict,debate_correct,num_rounds,early_stop,confidence,chain_of_thought_pred,few_shot_pred,one_shot_pred,self_consistency_pred,zero_shot_pred,chain_of_thought_correct,few_shot_correct,one_shot_correct,self_consistency_correct,zero_shot_correct
-demo_001,Did the Roman Empire exist at the same time as the Mayan civilization?,Yes,No,False,5,False,4,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True
-demo_002,Could Albert Einstein have used a calculator in high school?,No,No,True,5,False,3,No,No,No,No,Yes,True,True,True,True,False
-demo_003,Is the Great Wall of China visible from the Moon?,No,No,True,5,False,5,No,No,No,No,No,True,True,True,True,True
-demo_004,Would a person be able to survive on the surface of Mars without a spacesuit?,No,No,True,5,False,3,No,No,No,No,No,True,True,True,True,True
-demo_005,Can you legally drive a car in Japan at age 16?,No,No,True,5,False,3,No,No,No,No,No,True,True,True,True,True

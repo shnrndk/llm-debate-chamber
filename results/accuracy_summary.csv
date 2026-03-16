@@ -1,8 +1,0 @@
-rank,method,method_label,correct,total,accuracy_pct,avg_confidence,notes
-1,debate_single_judge,Debate + Single Judge,8,13,61.5%,3.62,Avg confidence: 3.62/5 | Avg rounds: 4.8
-2,zero_shot,Zero-Shot,5,13,38.5%,,
-3,self_consistency,Self-Consistency,5,13,38.5%,,"N=5 samples, majority vote"
-4,chain_of_thought,Chain-of-Thought (CoT),5,13,38.5%,,
-5,few_shot,Few-Shot,4,13,30.8%,,
-6,one_shot,One-Shot,4,13,30.8%,,
-7,debate_jury_panel,Debate + Jury Panel (Bonus),2,13,15.4%,3.60,Avg jury confidence: 3.60/5

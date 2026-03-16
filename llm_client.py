@@ -1,35 +1,54 @@
 """
-Thin wrapper around LM Studio's OpenAI-compatible local API.
+LLM client — wraps the OpenAI API (gpt-4o-mini by default).
 
-LM Studio runs a local server that mirrors the OpenAI chat/completions
-endpoint, so we use the `openai` Python library pointed at localhost.
+All agent modules import call_llm() and call_llm_stream() from here.
+To switch models, change MODEL_NAME in config.py — nothing else needs editing.
 
-All agent modules import `call_llm()` from here — model/URL changes
-only need to happen in config.py.
+Setup:
+    pip install openai
+    export OPENAI_API_KEY='sk-...'
 """
 
 from __future__ import annotations
+import os
+from pathlib import Path
 from openai import OpenAI
-from config import (
-    LM_STUDIO_BASE_URL, LM_STUDIO_API_KEY,
-    MODEL_NAME, MAX_TOKENS,
-)
 
-# ─── Client (module-level singleton) ─────────────────────────────────────────
+# Load .env file if present (python-dotenv)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).parent / ".env")
+except ImportError:
+    pass  # dotenv not installed — fall back to system env vars
+
+from config import OPENAI_BASE_URL, OPENAI_API_KEY, MODEL_NAME, MAX_TOKENS
+
+# --- Client singleton ---------------------------------------------------------
 
 _client: OpenAI | None = None
 
 def _get_client() -> OpenAI:
     global _client
-    if _client is None:
-        _client = OpenAI(
-            base_url=LM_STUDIO_BASE_URL,
-            api_key=LM_STUDIO_API_KEY,   # LM Studio ignores this; any value works
+    if _client is not None:
+        return _client
+
+    api_key = OPENAI_API_KEY or os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise EnvironmentError(
+            "OpenAI API key not found.\n"
+            "Set it with:  export OPENAI_API_KEY='sk-...'\n"
+            "Or add it to config.py:  OPENAI_API_KEY = 'sk-...'"
         )
+
+    kwargs: dict = {"api_key": api_key}
+    if OPENAI_BASE_URL:
+        kwargs["base_url"] = OPENAI_BASE_URL  # override for Azure / proxies
+
+    _client = OpenAI(**kwargs)
     return _client
 
 
-# ─── Public API ───────────────────────────────────────────────────────────────
+# --- Standard (non-streaming) call --------------------------------------------
 
 def call_llm(
     messages: list[dict],
@@ -39,21 +58,20 @@ def call_llm(
     model: str = MODEL_NAME,
 ) -> str:
     """
-    Call the local LM Studio server and return the assistant's text response.
+    Call the OpenAI chat completions API and return the assistant's text.
 
     Args:
         messages:    List of {"role": "user"|"assistant", "content": str} dicts.
-        system:      Optional system prompt — prepended as a {"role": "system"} message.
+        system:      Optional system prompt.
         temperature: Sampling temperature.
         max_tokens:  Maximum tokens in the response.
-        model:       Model identifier (must match the name shown in LM Studio).
+        model:       Model identifier (default from config.MODEL_NAME).
 
     Returns:
-        The assistant's response as a plain string.
+        Assistant response as a plain string.
     """
     client = _get_client()
 
-    # Build full message list: system goes first if provided
     full_messages: list[dict] = []
     if system:
         full_messages.append({"role": "system", "content": system})
@@ -65,9 +83,10 @@ def call_llm(
         temperature=temperature,
         max_tokens=max_tokens,
     )
-
     return response.choices[0].message.content.strip()
 
+
+# --- Streaming call -----------------------------------------------------------
 
 def call_llm_stream(
     messages: list[dict],
@@ -77,8 +96,9 @@ def call_llm_stream(
     model: str = MODEL_NAME,
 ):
     """
-    Same as call_llm() but yields token strings as they arrive from LM Studio.
-    Use in a for-loop:
+    Same as call_llm() but yields token strings as they stream in.
+
+    Usage:
         for token in call_llm_stream(...):
             print(token, end="", flush=True)
     """
@@ -102,25 +122,21 @@ def call_llm_stream(
                 yield delta.content
 
 
-# ─── Connection test ──────────────────────────────────────────────────────────
+# --- Connection test ----------------------------------------------------------
 
 def test_connection() -> bool:
-    """
-    Quick sanity-check: ping the local server with a trivial prompt.
-    Run this before starting a long experiment to catch config issues early.
-    """
+    """Quick sanity check — run before a long experiment."""
     try:
         reply = call_llm(
             messages=[{"role": "user", "content": "Reply with the single word: OK"}],
             temperature=0.0,
             max_tokens=10,
         )
-        print(f"[LM Studio] Connection OK — model replied: {reply!r}")
+        print(f"[OpenAI] Connection OK — {MODEL_NAME} replied: {reply!r}")
         return True
     except Exception as e:
-        print(f"[LM Studio] Connection FAILED: {e}")
-        print(f"  → Is LM Studio running at {LM_STUDIO_BASE_URL}?")
-        print(f"  → Is the model '{MODEL_NAME}' loaded in LM Studio?")
+        print(f"[OpenAI] Connection FAILED: {e}")
+        print(f"  Is OPENAI_API_KEY set?  Run: export OPENAI_API_KEY='sk-...'")
         return False
 
 
