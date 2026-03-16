@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LLM Debate Chamber</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg:#0a0a0b;--surface:#111114;--surface2:#18181d;--border:#2a2a35;--border2:#3a3a48;
+  --yes:#c8a96e;--yes-dim:#7a6640;--no:#7b9ecf;--no-dim:#3d5578;
+  --neutral:#a0a0b0;--text:#e8e8f0;--text-dim:#6a6a80;--accent:#e8c870;
+  --correct:#6fcf8e;--incorrect:#cf6f6f;
+  --ff-display:'Playfair Display',Georgia,serif;
+  --ff-body:'Libre Baskerville',Georgia,serif;
+  --ff-mono:'DM Mono',monospace;--r:4px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--ff-body);font-size:15px;line-height:1.7;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;opacity:.6}
+#app{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 80px}
+
+/* Header */
+header{text-align:center;padding:56px 0 40px;border-bottom:1px solid var(--border);margin-bottom:48px}
+.header-eyebrow{font-family:var(--ff-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+header h1{font-family:var(--ff-display);font-size:clamp(36px,6vw,64px);font-weight:900;line-height:1.05;color:var(--text);letter-spacing:-.02em}
+header h1 em{font-style:italic;color:var(--accent)}
+.header-sub{margin-top:12px;color:var(--text-dim);font-size:14px;font-family:var(--ff-mono)}
+
+/* Input */
+.input-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:32px;margin-bottom:32px}
+.input-panel label{display:block;font-family:var(--ff-mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.question-row{display:flex;gap:12px;align-items:flex-start}
+textarea#question{flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--ff-body);font-size:16px;line-height:1.6;padding:14px 16px;resize:vertical;min-height:80px;outline:none;transition:border-color .2s}
+textarea#question:focus{border-color:var(--accent)}
+textarea#question::placeholder{color:var(--text-dim);font-style:italic}
+.options-row{display:flex;gap:24px;margin-top:16px;flex-wrap:wrap}
+.toggle-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--ff-mono);font-size:12px;color:var(--neutral);user-select:none}
+.toggle-label input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px}
+
+/* Buttons */
+button.primary{background:var(--accent);color:#0a0a0b;border:none;border-radius:var(--r);font-family:var(--ff-mono);font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:14px 28px;cursor:pointer;white-space:nowrap;transition:background .15s,transform .1s;flex-shrink:0}
+button.primary:hover{background:#f0d888}
+button.primary:active{transform:scale(.98)}
+button.primary:disabled{background:var(--border2);color:var(--text-dim);cursor:not-allowed}
+button.ghost{background:transparent;color:var(--neutral);border:1px solid var(--border2);border-radius:var(--r);font-family:var(--ff-mono);font-size:11px;padding:6px 14px;cursor:pointer;transition:border-color .15s,color .15s}
+button.ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Phase bar */
+#phase-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 20px;margin-bottom:24px;display:none;align-items:center;gap:14px}
+#phase-bar.visible{display:flex}
+.spinner{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+#phase-text{font-family:var(--ff-mono);font-size:12px;color:var(--neutral);flex:1}
+.token-counter{font-family:var(--ff-mono);font-size:10px;color:var(--text-dim)}
+
+/* Live typing area */
+#live-box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r);padding:16px 20px;margin-bottom:24px;display:none}
+#live-box.visible{display:block}
+.live-label{font-family:var(--ff-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+#live-text{font-size:13px;color:var(--neutral);line-height:1.75;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto;font-family:var(--ff-mono)}
+.cursor{display:inline-block;width:2px;height:14px;background:var(--accent);animation:blink .7s step-end infinite;vertical-align:text-bottom;margin-left:1px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Arena */
+#debate-arena{display:none;animation:fadeUp .4s ease both}
+#debate-arena.visible{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.section-heading{font-family:var(--ff-mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--text-dim);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.section-heading span{color:var(--accent)}
+
+/* Question banner */
+.question-banner{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r);padding:20px 24px;margin-bottom:32px}
+.qb-label{font-family:var(--ff-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.qb-text{font-family:var(--ff-display);font-size:20px;font-style:italic;line-height:1.35;color:var(--text)}
+.question-meta{margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;font-family:var(--ff-mono);font-size:11px;color:var(--text-dim);align-items:center}
+.tag{padding:2px 8px;border-radius:2px;font-size:10px;font-family:var(--ff-mono)}
+.tag-yes{background:#2a2218;color:var(--yes);border:1px solid var(--yes-dim)}
+.tag-no{background:#18202e;color:var(--no);border:1px solid var(--no-dim)}
+.tag-neutral{background:var(--surface2);color:var(--neutral);border:1px solid var(--border2)}
+.tag-correct{background:#162416;color:var(--correct);border:1px solid #2d5e2d}
+.tag-wrong{background:#241616;color:var(--incorrect);border:1px solid #5e2d2d}
+
+/* Rounds */
+#rounds-container{margin-bottom:40px}
+.round-block{margin-bottom:24px;animation:fadeUp .3s ease both}
+.round-label{font-family:var(--ff-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.round-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.debaters-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.debaters-row{grid-template-columns:1fr}}
+.debater-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.debater-card.side-yes{border-top:2px solid var(--yes)}
+.debater-card.side-no{border-top:2px solid var(--no)}
+.debater-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.debater-name{font-family:var(--ff-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.side-yes .debater-name{color:var(--yes)}
+.side-no  .debater-name{color:var(--no)}
+.debater-body{padding:16px;font-size:13.5px;line-height:1.75;color:var(--neutral);white-space:pre-wrap;word-break:break-word;max-height:320px;overflow-y:auto;font-family:var(--ff-mono);font-size:12px}
+/* Live typing inside debater card */
+.debater-body .cursor{display:inline-block;width:2px;height:12px;background:var(--yes);animation:blink .7s step-end infinite;vertical-align:text-bottom}
+.side-no .debater-body .cursor{background:var(--no)}
+
+/* Verdict */
+.verdict-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px}
+.verdict-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:var(--surface2);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px}
+.verdict-title{font-family:var(--ff-display);font-size:18px;font-weight:700;color:var(--text)}
+.verdict-chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.verdict-big{font-family:var(--ff-display);font-size:28px;font-weight:900;letter-spacing:-.02em}
+.verdict-big.yes{color:var(--yes)}
+.verdict-big.no{color:var(--no)}
+.confidence-bar-wrap{display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:11px;color:var(--text-dim)}
+.confidence-bar{width:80px;height:4px;background:var(--border2);border-radius:2px;overflow:hidden}
+.confidence-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .8s ease}
+.verdict-body{padding:24px}
+.verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:700px){.verdict-grid{grid-template-columns:1fr}}
+.verdict-field-label{font-family:var(--ff-mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.verdict-field-value{font-size:13px;color:var(--neutral);line-height:1.65;white-space:pre-wrap}
+.verdict-field.full{grid-column:1/-1}
+
+/* Jury */
+.jury-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px}
+.jury-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:var(--surface2);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px}
+.juror-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:24px}
+.juror-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:border-color .2s}
+.juror-card.streaming{border-color:var(--accent)}
+.juror-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.juror-id{font-family:var(--ff-mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent)}
+.juror-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.juror-changed-badge{font-family:var(--ff-mono);font-size:9px;padding:2px 7px;border-radius:2px;background:#241a10;color:#e8a84e;border:1px solid #6a4a20;letter-spacing:.1em;text-transform:uppercase}
+.juror-votes{display:flex;gap:6px;margin:8px 0;align-items:center}
+.vote-pill{font-family:var(--ff-mono);font-size:10px;padding:3px 8px;border-radius:2px}
+.vote-pill.yes{background:#2a2218;color:var(--yes);border:1px solid var(--yes-dim)}
+.vote-pill.no{background:#18202e;color:var(--no);border:1px solid var(--no-dim)}
+.vote-arrow{color:var(--text-dim);font-size:12px}
+.juror-stream{font-size:11px;color:var(--text-dim);font-family:var(--ff-mono);line-height:1.6;margin-top:8px;border-top:1px solid var(--border);padding-top:8px;max-height:80px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+
+/* Baselines */
+.baselines-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px}
+.baselines-header{padding:16px 24px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:var(--ff-mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-dim)}
+.baselines-table{width:100%;border-collapse:collapse}
+.baselines-table th{font-family:var(--ff-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:10px 24px;text-align:left;border-bottom:1px solid var(--border)}
+.baselines-table td{padding:12px 24px;font-size:13px;border-bottom:1px solid var(--border);color:var(--neutral)}
+.baselines-table tr:last-child td{border-bottom:none}
+.baselines-table tr:hover td{background:var(--surface2)}
+.method-label{font-family:var(--ff-mono);font-size:12px}
+.streaming-row td{color:var(--text-dim)}
+
+/* History */
+.history-section{margin-top:48px;border-top:1px solid var(--border);padding-top:32px}
+.history-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:border-color .15s;gap:12px}
+.history-item:hover{border-color:var(--border2)}
+.history-q{font-size:13px;color:var(--neutral);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history-meta{font-family:var(--ff-mono);font-size:10px;color:var(--text-dim);white-space:nowrap;display:flex;align-items:center;gap:8px}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-dim);font-family:var(--ff-mono);font-size:12px;line-height:1.8}
+.empty-state .icon{font-size:32px;margin-bottom:12px;display:block}
+.error-box{background:#1a0f0f;border:1px solid #5e2d2d;border-radius:var(--r);padding:16px 20px;font-family:var(--ff-mono);font-size:12px;color:var(--incorrect);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<header>
+  <div class="header-eyebrow">Graduate Course · Assignment 2</div>
+  <h1>The <em>Debate</em> Chamber</h1>
+  <div class="header-sub">LLM &amp; Agentic Systems · Multi-Agent Adversarial Reasoning · Live Token Streaming</div>
+</header>
+
+<div class="input-panel">
+  <label for="question">Submit a Yes / No Question</label>
+  <div class="question-row">
+    <textarea id="question" rows="2"
+      placeholder="e.g. Did the Roman Empire exist at the same time as the Mayan civilization?"></textarea>
+    <button class="primary" id="submit-btn" onclick="startDebate()">Debate →</button>
+  </div>
+  <div class="options-row">
+    <label class="toggle-label">
+      <input type="checkbox" id="opt-baselines" checked />
+      Run Baselines (Zero/One/Few-shot, CoT, Self-Consistency)
+    </label>
+    <label class="toggle-label">
+      <input type="checkbox" id="opt-jury" checked />
+      Run Jury Panel (Bonus +15%)
+    </label>
+  </div>
+</div>
+
+<!-- Phase status bar -->
+<div id="phase-bar">
+  <div class="spinner"></div>
+  <span id="phase-text">Initializing…</span>
+  <span class="token-counter" id="token-counter"></span>
+</div>
+
+<!-- Live token stream box -->
+<div id="live-box">
+  <div class="live-label" id="live-label">…</div>
+  <div id="live-text"></div>
+</div>
+
+<!-- Full debate arena (shown progressively) -->
+<div id="debate-arena">
+  <div class="question-banner">
+    <div class="qb-label">Question Under Debate</div>
+    <div class="qb-text" id="qb-text"></div>
+    <div class="question-meta" id="qb-meta"></div>
+  </div>
+
+  <div class="section-heading"><span>◆</span> Debate Transcript</div>
+  <div id="rounds-container"></div>
+
+  <div id="judge-section" style="display:none">
+    <div class="section-heading"><span>◆</span> Single Judge Verdict</div>
+    <div class="verdict-panel" id="judge-panel"></div>
+  </div>
+
+  <div id="jury-section" style="display:none">
+    <div class="section-heading"><span>◆</span> Jury Panel · Bonus</div>
+    <div class="jury-panel" id="jury-panel-el"></div>
+  </div>
+
+  <div id="baselines-section" style="display:none">
+    <div class="section-heading"><span>◆</span> Baseline Comparisons</div>
+    <div class="baselines-panel" id="baselines-panel-el"></div>
+  </div>
+</div>
+
+<div class="history-section">
+  <div class="section-heading"><span>◆</span> Past Debates</div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+    <button class="ghost" onclick="loadHistory()">↻ Refresh</button>
+  </div>
+  <div id="history-list" class="history-list">
+    <div class="empty-state"><span class="icon">📜</span>No past debates yet.</div>
+  </div>
+</div>
+
+</div><!-- #app -->
+<script>
+const API = 'http://localhost:8000';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const vc = v => v && v.toLowerCase()==='yes' ? 'yes' : 'no';
+
+// ── State ───────────────────────────────────────────────────────────────────
+let es = null;            // EventSource
+let tokenCount = 0;
+let currentLabel = '';
+// Per-turn live state: keyed by label
+const liveBuffers  = {};  // label → accumulated text so far
+const liveElements = {};  // label → DOM element to stream into
+const roundCards   = {};  // "A_0", "B_1" etc → card body element
+const jurorCards   = {};  // juror_id → { card, streamEl }
+const baselineRows = {};  // method → <tr> element
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+const methodLabel = k => ({
+  zero_shot:'Zero-Shot', one_shot:'One-Shot', few_shot:'Few-Shot',
+  chain_of_thought:'Chain-of-Thought (CoT)', self_consistency:'Self-Consistency',
+}[k] || k);
+
+function timeAgo(iso) {
+  if (!iso) return '';
+  const diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+  return diff < 60 ? `${diff}s ago` : diff < 3600 ? `${Math.floor(diff/60)}m ago` : new Date(iso).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── Phase bar ────────────────────────────────────────────────────────────────
+function setPhase(label, visible=true) {
+  $('phase-bar').classList.toggle('visible', visible);
+  if (label) $('phase-text').textContent = label;
+  currentLabel = label;
+}
+function setTokenCount(n) {
+  $('token-counter').textContent = n > 0 ? `${n} tokens` : '';
+}
+
+// ── Live box ─────────────────────────────────────────────────────────────────
+function showLiveBox(label, text) {
+  $('live-box').classList.add('visible');
+  $('live-label').textContent = label;
+  $('live-text').innerHTML = esc(text) + '<span class="cursor"></span>';
+  const lb = $('live-text');
+  lb.scrollTop = lb.scrollHeight;
+}
+function hideLiveBox() {
+  $('live-box').classList.remove('visible');
+  $('live-text').innerHTML = '';
+}
+
+// ── Init debate UI ────────────────────────────────────────────────────────────
+function initArena(question) {
+  $('qb-text').textContent = question;
+  $('qb-meta').innerHTML = '';
+  $('rounds-container').innerHTML = '';
+  $('judge-panel').innerHTML = '';
+  $('judge-section').style.display = 'none';
+  $('jury-section').style.display = 'none';
+  $('baselines-section').style.display = 'none';
+  $('jury-panel-el').innerHTML = '';
+  $('baselines-panel-el').innerHTML = '';
+  $('debate-arena').classList.add('visible');
+  Object.keys(liveBuffers).forEach(k => delete liveBuffers[k]);
+  Object.keys(liveElements).forEach(k => delete liveElements[k]);
+  Object.keys(roundCards).forEach(k => delete roundCards[k]);
+  Object.keys(jurorCards).forEach(k => delete jurorCards[k]);
+  Object.keys(baselineRows).forEach(k => delete baselineRows[k]);
+}
+
+// ── Create / get round card ───────────────────────────────────────────────────
+function ensureRound(phase, round, debater) {
+  const roundKey = `round_${round}`;
+  let roundBlock = document.getElementById(`round-block-${round}`);
+  if (!roundBlock) {
+    roundBlock = document.createElement('div');
+    roundBlock.className = 'round-block';
+    roundBlock.id = `round-block-${round}`;
+    const label = round === 0 ? 'Opening Positions' : `Round ${round}`;
+    roundBlock.innerHTML = `
+      <div class="round-label">${esc(label)}</div>
+      <div class="debaters-row" id="debaters-row-${round}">
+        <div class="debater-card side-yes" id="card-A-${round}">
+          <div class="debater-header">
+            <span class="debater-name">Debater A — YES</span>
+            <span class="tag tag-yes" id="pos-A-${round}">Yes</span>
+          </div>
+          <div class="debater-body" id="body-A-${round}"><span class="cursor"></span></div>
+        </div>
+        <div class="debater-card side-no" id="card-B-${round}">
+          <div class="debater-header">
+            <span class="debater-name">Debater B — NO</span>
+            <span class="tag tag-no" id="pos-B-${round}">No</span>
+          </div>
+          <div class="debater-body" id="body-B-${round}"><span class="cursor"></span></div>
+        </div>
+      </div>`;
+    $('rounds-container').appendChild(roundBlock);
+    roundBlock.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+  return document.getElementById(`body-${debater}-${round}`);
+}
+
+// ── Baselines table ───────────────────────────────────────────────────────────
+function ensureBaselinesTable() {
+  if ($('baselines-section').style.display !== 'none') return;
+  $('baselines-section').style.display = 'block';
+  $('baselines-panel-el').innerHTML = `
+    <div class="baselines-header">Baseline Method Comparison — streaming…</div>
+    <table class="baselines-table">
+      <thead><tr><th>Method</th><th>Prediction</th></tr></thead>
+      <tbody id="baselines-tbody"></tbody>
+    </table>`;
+}
+function ensureBaselineRow(method) {
+  if (baselineRows[method]) return baselineRows[method];
+  ensureBaselinesTable();
+  const tr = document.createElement('tr');
+  tr.className = 'streaming-row';
+  tr.id = `bl-row-${method}`;
+  tr.innerHTML = `<td class="method-label">${esc(methodLabel(method))}</td><td id="bl-pred-${method}">…</td>`;
+  document.getElementById('baselines-tbody').appendChild(tr);
+  baselineRows[method] = tr;
+  return tr;
+}
+
+// ── Jury cards ────────────────────────────────────────────────────────────────
+function ensureJurySection() {
+  if ($('jury-section').style.display !== 'none') return;
+  $('jury-section').style.display = 'block';
+  $('jury-panel-el').innerHTML = `
+    <div class="jury-header">
+      <div class="verdict-title">Jury Panel — deliberating…</div>
+      <div class="verdict-chips" id="jury-header-chips"></div>
+    </div>
+    <div class="juror-grid" id="juror-grid"></div>
+    <div id="jury-footer" style="padding:0 24px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>`;
+}
+function ensureJurorCard(jid, title) {
+  if (jurorCards[jid]) return jurorCards[jid];
+  ensureJurySection();
+  const card = document.createElement('div');
+  card.className = 'juror-card streaming';
+  card.id = `juror-card-${jid}`;
+  card.innerHTML = `
+    <div class="juror-card-header">
+      <span class="juror-id">${esc(jid)}</span>
+      <span id="juror-badge-${jid}"></span>
+    </div>
+    <div class="juror-title">${esc(title)}</div>
+    <div class="juror-votes" id="juror-votes-${jid}"><span class="vote-pill" style="background:var(--surface2);color:var(--text-dim)">…</span></div>
+    <div class="juror-stream" id="juror-stream-${jid}"><span class="cursor"></span></div>`;
+  document.getElementById('juror-grid').appendChild(card);
+  const streamEl = document.getElementById(`juror-stream-${jid}`);
+  jurorCards[jid] = {card, streamEl};
+  return jurorCards[jid];
+}
+
+// ── Judge section ─────────────────────────────────────────────────────────────
+function ensureJudgeSection() {
+  if ($('judge-section').style.display !== 'none') return;
+  $('judge-section').style.display = 'block';
+  $('judge-panel').innerHTML = `
+    <div class="verdict-header">
+      <div class="verdict-title">Judge Deliberating…</div>
+      <div class="verdict-chips"><div class="spinner"></div></div>
+    </div>
+    <div class="verdict-body">
+      <div class="verdict-field full">
+        <div class="verdict-field-label">Streaming judge reasoning…</div>
+        <div class="verdict-field-value" id="judge-stream-text" style="font-family:var(--ff-mono);font-size:12px;color:var(--text-dim);max-height:200px;overflow-y:auto;white-space:pre-wrap"><span class="cursor"></span></div>
+      </div>
+    </div>`;
+}
+
+// ── SSE token routing ─────────────────────────────────────────────────────────
+function routeToken(label, token) {
+  if (!liveBuffers[label]) liveBuffers[label] = '';
+  liveBuffers[label] += token;
+  tokenCount++;
+  setTokenCount(tokenCount);
+  showLiveBox(label, liveBuffers[label]);
+
+  // Route to specific card
+  if (label === 'debater_a_init') {
+    const el = ensureRound('init', 0, 'A');
+    el.innerHTML = esc(liveBuffers[label]) + '<span class="cursor"></span>';
+    el.scrollTop = el.scrollHeight;
+  } else if (label === 'debater_b_init') {
+    const el = ensureRound('init', 0, 'B');
+    el.innerHTML = esc(liveBuffers[label]) + '<span class="cursor"></span>';
+    el.scrollTop = el.scrollHeight;
+  } else if (/^debater_a_r(\d+)$/.test(label)) {
+    const rn = parseInt(label.match(/\d+/)[0]);
+    const el = ensureRound('debate', rn, 'A');
+    el.innerHTML = esc(liveBuffers[label]) + '<span class="cursor"></span>';
+    el.scrollTop = el.scrollHeight;
+  } else if (/^debater_b_r(\d+)$/.test(label)) {
+    const rn = parseInt(label.match(/\d+/)[0]);
+    const el = ensureRound('debate', rn, 'B');
+    el.innerHTML = esc(liveBuffers[label]) + '<span class="cursor"></span>';
+    el.scrollTop = el.scrollHeight;
+  } else if (label === 'judge') {
+    ensureJudgeSection();
+    const el = $('judge-stream-text');
+    el.innerHTML = esc(liveBuffers[label]) + '<span class="cursor"></span>';
+    el.scrollTop = el.scrollHeight;
+  } else if (/^juror_(J\d+)$/.test(label)) {
+    const jid = label.replace('juror_', '');
+    const {streamEl} = jurorCards[jid] || {};
+    if (streamEl) {
+      streamEl.innerHTML = esc(liveBuffers[label].slice(-300)) + '<span class="cursor"></span>';
+      streamEl.scrollTop = streamEl.scrollHeight;
+    }
+  } else if (/^deliberation_(J\d+)$/.test(label)) {
+    const jid = label.replace('deliberation_', '');
+    const {streamEl} = jurorCards[jid] || {};
+    if (streamEl) {
+      streamEl.innerHTML = '<em style="color:var(--accent)">Deliberating…</em><br>' +
+        esc(liveBuffers[label].slice(-200)) + '<span class="cursor"></span>';
+    }
+  }
+}
+
+// ── SSE event handlers ────────────────────────────────────────────────────────
+function handlePhaseStart(data) {
+  setPhase(data.label);
+}
+
+function handleTurnDone(data) {
+  hideLiveBox();
+  const label = data.label;
+  const text = data.text || '';
+
+  if (label === 'debater_a_init') {
+    const el = ensureRound('init', 0, 'A');
+    el.innerHTML = esc(text);
+    if (data.position) $(`pos-A-0`).textContent = data.position;
+  } else if (label === 'debater_b_init') {
+    const el = ensureRound('init', 0, 'B');
+    el.innerHTML = esc(text);
+    if (data.position) $(`pos-B-0`).textContent = data.position;
+  } else if (/^debater_a_r(\d+)$/.test(label)) {
+    const rn = parseInt(label.match(/\d+/)[0]);
+    const el = ensureRound('debate', rn, 'A');
+    el.innerHTML = esc(text);
+    if (data.position) $(`pos-A-${rn}`).textContent = data.position;
+  } else if (/^debater_b_r(\d+)$/.test(label)) {
+    const rn = parseInt(label.match(/\d+/)[0]);
+    const el = ensureRound('debate', rn, 'B');
+    el.innerHTML = esc(text);
+    if (data.position) $(`pos-B-${rn}`).textContent = data.position;
+  } else if (label === 'judge') {
+    renderJudgeVerdict(data);
+  } else if (label === 'foreman') {
+    finalizeJury(data);
+  }
+}
+
+function handleBaselineDone(data) {
+  const tr = ensureBaselineRow(data.method);
+  const predEl = $(`bl-pred-${data.method}`);
+  const v = (data.predicted || '').toLowerCase() === 'yes' ? 'yes' : 'no';
+  predEl.innerHTML = `<span class="tag tag-${v}">${esc(data.predicted || '?')}</span>`;
+  tr.classList.remove('streaming-row');
+}
+
+function handleJuryJuror(data) {
+  const jid = data.juror_id;
+  const {card} = ensureJurorCard(jid, data.juror_title || jid);
+  card.classList.remove('streaming');
+
+  const votesEl = $(`juror-votes-${jid}`);
+  const v = vc(data.verdict);
+  if (data.phase === 'deliberation') {
+    // update to show revision
+    const changed = data.position_changed;
+    if (changed) {
+      $(`juror-badge-${jid}`).innerHTML = '<span class="juror-changed-badge">Revised</span>';
+    }
+    votesEl.innerHTML += `<span class="vote-arrow">→</span><span class="vote-pill ${v}">${esc(data.verdict)}</span>`;
+  } else {
+    votesEl.innerHTML = `<span class="vote-pill ${v}">${esc(data.verdict)}</span>
+      <span style="font-family:var(--ff-mono);font-size:10px;color:var(--text-dim)">${data.confidence}/5</span>`;
+  }
+}
+
+function renderJudgeVerdict(j) {
+  const v = vc(j.verdict);
+  const confPct = (j.confidence / 5) * 100;
+  $('judge-section').style.display = 'block';
+  $('judge-panel').innerHTML = `
+    <div class="verdict-header">
+      <div class="verdict-title">Judge's Ruling</div>
+      <div class="verdict-chips">
+        <div class="verdict-big ${v}">${esc(j.verdict || '—')}</div>
+        <div class="confidence-bar-wrap">
+          <div class="confidence-bar"><div class="confidence-fill" style="width:${confPct}%"></div></div>
+          <span>${j.confidence}/5</span>
+        </div>
+      </div>
+    </div>
+    <div class="verdict-body">
+      <div class="verdict-field full">
+        <div class="verdict-field-label">Chain-of-Thought Analysis</div>
+        <div class="verdict-field-value">${esc(j.cot_analysis || '—')}</div>
+      </div>
+      <div class="verdict-grid" style="margin-top:20px">
+        <div class="verdict-field">
+          <div class="verdict-field-label">Debater A — Strongest</div>
+          <div class="verdict-field-value" style="color:var(--yes)">${esc(j.debater_a_strongest||'—')}</div>
+        </div>
+        <div class="verdict-field">
+          <div class="verdict-field-label">Debater B — Strongest</div>
+          <div class="verdict-field-value" style="color:var(--no)">${esc(j.debater_b_strongest||'—')}</div>
+        </div>
+        <div class="verdict-field">
+          <div class="verdict-field-label">Debater A — Weakest</div>
+          <div class="verdict-field-value">${esc(j.debater_a_weakest||'—')}</div>
+        </div>
+        <div class="verdict-field">
+          <div class="verdict-field-label">Debater B — Weakest</div>
+          <div class="verdict-field-value">${esc(j.debater_b_weakest||'—')}</div>
+        </div>
+        <div class="verdict-field full">
+          <div class="verdict-field-label">Winner Reasoning</div>
+          <div class="verdict-field-value">${esc(j.winner_reasoning||'—')}</div>
+        </div>
+      </div>
+    </div>`;
+  $('judge-section').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function finalizeJury(data) {
+  const v = vc(data.majority_verdict);
+  const yes = (data.final_vote_counts||{})['Yes'] || 0;
+  const no  = (data.final_vote_counts||{})['No']  || 0;
+  const chips = $('jury-header-chips');
+  if (chips) {
+    chips.innerHTML = `
+      <div class="verdict-big ${v}">${esc(data.majority_verdict||'—')}</div>
+      <span class="tag tag-neutral">${yes}–${no}</span>
+      ${data.difficulty ? `<span class="tag tag-neutral">${esc(data.difficulty)}</span>` : ''}
+      <span class="confidence-bar-wrap">
+        <div class="confidence-bar"><div class="confidence-fill" style="width:${(data.panel_confidence/5)*100}%"></div></div>
+        <span>${data.panel_confidence}/5</span>
+      </span>`;
+  }
+  const footer = $('jury-footer');
+  if (footer && (data.agreement_points || data.disagreement_points)) {
+    footer.innerHTML = `
+      <div class="verdict-field">
+        <div class="verdict-field-label">Agreement Points</div>
+        <div class="verdict-field-value">${esc(data.agreement_points||'—')}</div>
+      </div>
+      <div class="verdict-field">
+        <div class="verdict-field-label">Disagreement Points</div>
+        <div class="verdict-field-value">${esc(data.disagreement_points||'—')}</div>
+      </div>`;
+  }
+}
+
+function handleComplete(data) {
+  setPhase('', false);
+  hideLiveBox();
+  $('submit-btn').disabled = false;
+
+  // Update question meta
+  const v = vc(data.judge && data.judge.verdict);
+  $('qb-meta').innerHTML = `
+    <span>Rounds: ${data.num_rounds}</span>
+    <span class="tag tag-${v}">${esc((data.judge||{}).verdict||'?')}</span>
+    ${data.early_stop ? '<span class="tag tag-neutral">Early Stop</span>' : ''}
+    ${data.initial_consensus ? '<span class="tag tag-neutral">Initial Consensus</span>' : ''}
+    <span style="font-family:var(--ff-mono);font-size:10px;color:var(--text-dim)">${tokenCount} tokens streamed</span>`;
+
+  loadHistory();
+}
+
+function handleError(data) {
+  setPhase('Error', false);
+  hideLiveBox();
+  $('submit-btn').disabled = false;
+  $('rounds-container').innerHTML =
+    `<div class="error-box">Pipeline error:\n${esc(data.message || 'Unknown error')}\n\n${esc(data.traceback||'')}</div>`;
+}
+
+// ── Start debate ──────────────────────────────────────────────────────────────
+function startDebate() {
+  const question = $('question').value.trim();
+  if (!question) { $('question').focus(); return; }
+  const runBaselines = $('opt-baselines').checked;
+  const runJury      = $('opt-jury').checked;
+
+  if (es) { es.close(); es = null; }
+  tokenCount = 0;
+  setTokenCount(0);
+  $('submit-btn').disabled = true;
+  initArena(question);
+  setPhase('Connecting to debate pipeline…');
+
+  const params = new URLSearchParams({
+    question, run_baselines: runBaselines, run_jury: runJury,
+  });
+  es = new EventSource(`${API}/api/stream?${params}`);
+
+  es.addEventListener('phase_start',   e => handlePhaseStart(JSON.parse(e.data)));
+  es.addEventListener('token',         e => { const d = JSON.parse(e.data); routeToken(d.label, d.token); });
+  es.addEventListener('turn_done',     e => handleTurnDone(JSON.parse(e.data)));
+  es.addEventListener('baseline_done', e => handleBaselineDone(JSON.parse(e.data)));
+  es.addEventListener('jury_juror',    e => handleJuryJuror(JSON.parse(e.data)));
+  es.addEventListener('complete',      e => { handleComplete(JSON.parse(e.data)); es.close(); es = null; });
+  es.addEventListener('error',         e => {
+    try { handleError(JSON.parse(e.data)); } catch { handleError({message: 'Connection lost'}); }
+    es.close(); es = null;
+  });
+  es.onerror = (e) => {
+    // readyState 2 = CLOSED (stream ended normally after 'complete' event)
+    // readyState 0 = CONNECTING (retrying — real connection failure)
+    if (es && es.readyState !== EventSource.CLOSED) {
+      // Only show error if we haven't already received a complete event
+      if ($('submit-btn').disabled) {
+        handleError({message: 'Could not connect to the API at ' + API + '/api/stream\n\nMake sure uvicorn is running:\n  uvicorn api:app --reload --port 8000'});
+        es.close();
+        es = null;
+      }
+    }
+    $('submit-btn').disabled = false;
+  };
+}
+
+// ── History ───────────────────────────────────────────────────────────────────
+async function loadHistory() {
+  try {
+    const res = await fetch(`${API}/api/debates`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const el = $('history-list');
+    const debates = data.debates || [];
+    if (!debates.length) {
+      el.innerHTML = '<div class="empty-state"><span class="icon">📜</span>No past debates yet.</div>';
+      return;
+    }
+    el.innerHTML = debates.slice(0,20).map(d => `
+      <div class="history-item" onclick="loadPastDebate('${esc(d.debate_id)}')">
+        <span class="history-q" title="${esc(d.question)}">${esc(d.question)}</span>
+        <span class="history-meta">${timeAgo(d.created_at)}</span>
+      </div>`).join('');
+  } catch {}
+}
+
+async function loadPastDebate(id) {
+  try {
+    const res = await fetch(`${API}/api/debate/${id}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.result) return;
+    const r = data.result;
+    $('question').value = r.question;
+    initArena(r.question);
+
+    // Render rounds
+    for (const round of r.rounds_timeline) {
+      const bodyA = ensureRound(round.phase, round.round, 'A');
+      const bodyB = ensureRound(round.phase, round.round, 'B');
+      bodyA.innerHTML = esc(round.debater_a.text);
+      bodyB.innerHTML = esc(round.debater_b.text);
+      if (round.debater_a.position) {
+        const pa = $(`pos-A-${round.round}`); if (pa) pa.textContent = round.debater_a.position;
+      }
+      if (round.debater_b.position) {
+        const pb = $(`pos-B-${round.round}`); if (pb) pb.textContent = round.debater_b.position;
+      }
+    }
+    if (r.judge && r.judge.verdict) renderJudgeVerdict(r.judge);
+
+    if (r.jury && r.jury.enabled) {
+      for (const jv of (r.jury.jurors||[])) {
+        ensureJurorCard(jv.id, jv.title);
+        handleJuryJuror({juror_id:jv.id, juror_title:jv.title, verdict:jv.final_verdict||jv.initial_verdict, confidence:jv.confidence});
+      }
+      finalizeJury({
+        majority_verdict: r.jury.majority_verdict,
+        panel_confidence: r.jury.panel_confidence,
+        difficulty: r.jury.difficulty,
+        final_vote_counts: r.jury.final_vote_counts,
+        agreement_points: r.jury.agreement_points,
+        disagreement_points: r.jury.disagreement_points,
+      });
+    }
+
+    if (r.baselines && Object.keys(r.baselines).length) {
+      for (const [m, b] of Object.entries(r.baselines)) {
+        ensureBaselineRow(m);
+        handleBaselineDone({method: m, predicted: b.predicted});
+      }
+    }
+
+    const v = vc((r.judge||{}).verdict);
+    $('qb-meta').innerHTML = `<span>Rounds: ${r.num_rounds}</span><span class="tag tag-${v}">${esc((r.judge||{}).verdict||'?')}</span>`;
+    window.scrollTo({top: $('debate-arena').offsetTop - 20, behavior:'smooth'});
+  } catch(e) { console.error(e); }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadHistory();
+  $('question').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) startDebate();
+  });
+});
+</script>
+</body>
+</html>
