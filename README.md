@@ -3,23 +3,34 @@
 **LLM & Agentic Systems | Graduate Course**  
 *Building Adversarial Multi-Agent Reasoning Systems*
 
-A multi-agent debate system where two LLM agents argue opposing sides of a StrategyQA yes/no question, supervised by an LLM judge. Includes a full baseline comparison suite and a multi-agent jury panel (bonus component).
+A multi-agent debate system where two LLM agents argue opposing sides of a StrategyQA yes/no question, supervised by an LLM judge and a multi-agent jury panel. Includes a full baseline comparison suite, a live-streaming web UI, and a REST API.
+
+📄 **[View Full Report](https://shnrndk.github.io/llm-debate-chamber/)** — Methodology, experiments, analysis, and prompt engineering
 
 ---
 
-## Results (13 questions, StrategyQA, gpt-4o-mini)
+## Results (100 questions, StrategyQA, gpt-4o-mini)
 
-| Method | Accuracy |
-|--------|----------|
-| Zero-Shot | 30.8% |
-| One-Shot | 30.8% |
-| Few-Shot | 30.8% |
-| Chain-of-Thought (CoT) | 38.5% |
-| Self-Consistency | 38.5% |
-| **Debate + Single Judge** | **61.5%** |
-| Debate + Jury Panel (Bonus) | 15.4% |
+| Rank | Method | Correct / 100 | Accuracy |
+|------|--------|--------------|----------|
+| 1 | Chain-of-Thought (CoT) | 85 | 85.0% |
+| 2 | Self-Consistency | 84 | 84.0% |
+| 3 | One-Shot | 75 | 75.0% |
+| 4 | Zero-Shot | 72 | 72.0% |
+| — | **Debate + Jury Panel** ✦ | **71** | **71.0%** |
+| 5 | Few-Shot | 69 | 69.0% |
+| — | **Debate + Single Judge** ✦ | **68** | **68.0%** |
 
-Debate outperforms the best baseline by **+23 percentage points**.
+✦ = debate pipeline components  
+Avg judge confidence: 4.07/5 · Avg rounds: 4.4 · Early stops: 38/100
+
+---
+
+## Report
+
+The full written report is in **`https://shnrndk.github.io/llm-debate-chamber/`** — open it directly in a browser or host via GitHub Pages.
+
+Sections: Methodology · Experiments · Analysis · Prompt Engineering · Prompt Appendix
 
 ---
 
@@ -41,6 +52,7 @@ llm_debate/
 ├── evaluate.py           # Accuracy aggregation + 4 CSV report files
 ├── main.py               # CLI entry point
 ├── api.py                # FastAPI REST + SSE streaming backend
+├── report.html           # GitHub Pages report — dark/light mode toggle, all 4 sections
 ├── frontend/
 │   └── index.html        # Web UI with live token streaming
 ├── requirements.txt
@@ -62,12 +74,7 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-```
-
-Edit `.env` and add your OpenAI key:
-
-```
-OPENAI_API_KEY=sk-...
+# Edit .env and add:  OPENAI_API_KEY=sk-...
 ```
 
 ### 3. Test the connection
@@ -84,7 +91,7 @@ python llm_client.py
 ### Command line
 
 ```bash
-# Run 3 questions (quick test)
+# Quick test — 3 questions
 python main.py --data strategy_qa_test.json --n 3
 
 # Full experiment — 100 questions
@@ -96,18 +103,19 @@ python main.py --data strategy_qa_test.json --n 100 --no-baseline
 # Skip jury panel
 python main.py --data strategy_qa_test.json --n 100 --no-jury
 
-# Re-generate CSVs from existing logs without any API calls
+# Re-generate CSVs from existing logs (no API calls)
 python main.py --eval-only
 ```
 
-### Web UI
+### Web UI (live token streaming)
 
 ```bash
 uvicorn api:app --reload --port 8000
 open http://localhost:8000
 ```
 
-The UI streams tokens live as each agent thinks, shows round-by-round debate transcripts, judge verdict, jury panel deliberation, and baseline comparison.
+The UI streams every token live as each agent thinks, shows round-by-round debate transcripts, judge verdict panel, jury deliberation, and baseline comparison table.
+
 
 ---
 
@@ -115,11 +123,11 @@ The UI streams tokens live as each agent thinks, shows round-by-round debate tra
 
 | Phase | Description |
 |-------|-------------|
-| **1 — Initialization** | Both debaters independently generate an opening position without seeing each other's response. If they agree, skip to Phase 3. |
-| **2 — Multi-Round Debate** | Min 3, max 5 rounds. Each round: Debater A argues, then Debater B counters with full transcript context. Adaptive early stopping if both converge for 2 consecutive rounds. |
-| **3 — Judgment** | Judge reads the full transcript and produces: CoT analysis, strongest/weakest arguments per side, final verdict, confidence score (1–5). |
-| **4 — Evaluation** | Compare judge verdict to ground truth. Log everything to JSON. |
-| **3B — Jury Panel** *(Bonus)* | 5 jurors with distinct personas evaluate independently, then deliberate (with votes hidden to prevent conformity bias), then a Foreman synthesizes the panel ruling. |
+| **1 — Init** | Both debaters independently generate an opening position. If they agree, skip to Phase 3. |
+| **2 — Debate** | Min 3, max 5 rounds. Each round: Debater A argues, Debater B counters with full transcript context. Early stop if both converge for 2 consecutive rounds. |
+| **3 — Judgment** | Judge produces: CoT analysis, strongest/weakest args per side, verdict, confidence (1–5). |
+| **3B — Jury** *(Bonus)* | 5 jurors evaluate independently → blind deliberation (votes hidden) → Foreman ruling. |
+| **4 — Evaluation** | Compare verdicts to ground truth. Log everything to JSON. Generate 4 CSVs. |
 
 ---
 
@@ -137,19 +145,13 @@ The UI streams tokens live as each agent thinks, shows round-by-round debate tra
 
 ## Dataset
 
-Supports two formats out of the box:
+Supports two formats — auto-detected from file content:
 
-**StrategyQA** (JSON array — `.json`):
+**StrategyQA** (`.json` — JSON array):
 ```json
 [{"qid": "...", "question": "...", "answer": true, "facts": [...], "decomposition": [...]}]
 ```
 
-**SciFact** (JSONL — `.jsonl`):
-```
-{"id": 7, "claim": "...", "label": "SUPPORTS"}
-```
-
-The loader auto-detects format from the first character of the file.
 
 ---
 
@@ -159,43 +161,25 @@ The loader auto-detects format from the first character of the file.
 |-----------|---------|-------------|
 | `MODEL_NAME` | `gpt-4o-mini` | OpenAI model for all agents |
 | `TEMPERATURE` | `0.7` | Debater sampling temperature |
-| `JUDGE_TEMPERATURE` | `0.2` | Judge temperature (lower = more deterministic) |
-| `MAX_DEBATE_ROUNDS` | `5` | Hard cap on debate rounds |
-| `MIN_DEBATE_ROUNDS` | `3` | Minimum rounds before early stop |
+| `JUDGE_TEMPERATURE` | `0.2` | Lower = more deterministic verdicts |
+| `MAX_DEBATE_ROUNDS` | `5` | Hard cap on rounds |
+| `MIN_DEBATE_ROUNDS` | `3` | Minimum before early stop is eligible |
 | `CONVERGENCE_ROUNDS` | `2` | Consecutive agreement rounds to trigger early stop |
-| `SELF_CONSISTENCY_N` | `5` | Samples for self-consistency baseline |
-| `JURY_SIZE` | `5` | Number of jurors in the panel |
-| `JURY_DELIBERATION` | `True` | Whether jurors deliberate after independent evaluation |
+| `SELF_CONSISTENCY_N` | `5` | Samples for self-consistency majority vote |
+| `JURY_SIZE` | `5` | Jurors in the panel |
+| `JURY_DELIBERATION` | `True` | Enable blind deliberation phase |
 
 ---
 
 ## Output Files
 
-Every run produces four CSV files in `results/` and one JSON log per question in `logs/`:
-
 | File | Contents |
 |------|----------|
-| `results/accuracy_summary.csv` | Per-method accuracy, rank, confidence — **main Table 1 for report** |
+| `results/accuracy_summary.csv` | Per-method accuracy, rank, confidence — **Table 1 for report** |
 | `results/per_question_detail.csv` | Every method's prediction per question side-by-side |
 | `results/jury_analysis.csv` | Per-juror votes, revisions, panel confidence, difficulty |
 | `results/debate_efficiency.csv` | Rounds used, early stops, consensus timing |
 | `logs/<qid>_<date>.json` | Full transcript: all turns, judge reasoning, jury deliberation |
-
----
-
-## Jury Panel — Bonus Component
-
-5 jurors with distinct evaluation personas:
-
-| Juror | Persona | Focus |
-|-------|---------|-------|
-| J1 | Logical Analyst | Argument validity and deductive reasoning |
-| J2 | Evidence Critic | Factual accuracy and evidence quality |
-| J3 | Devil's Advocate | Hidden assumptions, steelmanning the losing side |
-| J4 | Synthesis Judge | Overall narrative coherence across rounds |
-| J5 | Empirical Realist | Real-world plausibility and epistemic humility |
-
-Deliberation uses **blind voting** — jurors see each other's reasoning but not their verdicts, preventing conformity cascades.
 
 ---
 
@@ -204,24 +188,26 @@ Deliberation uses **blind voting** — jurors see each other's reasoning but not
 | Endpoint | Description |
 |----------|-------------|
 | `GET /api/health` | Health check |
-| `POST /api/debate` | Submit question (async, returns debate_id) |
+| `POST /api/debate` | Submit question async — returns `debate_id` |
 | `GET /api/debate/{id}` | Poll for result |
 | `GET /api/debates` | List all past debates |
 | `GET /api/stream?question=...` | Live SSE token stream |
 
 ---
 
-## Cost Estimate (gpt-4o-mini)
+## Jury Panel — Bonus Component
 
-With 5 debate rounds, 5 baselines, and 5 jury jurors per question:
+5 jurors with distinct evaluation lenses deliberate using **blind voting** (votes hidden during deliberation to prevent conformity cascades):
 
-| Scale | Estimated Cost |
-|-------|----------------|
-| 10 questions | ~$0.30–0.50 |
-| 100 questions | ~$3–5 |
-| 200 questions | ~$6–10 |
+| Juror | Persona | Focus |
+|-------|---------|-------|
+| J1 | Logical Analyst | Argument validity, deductive chains |
+| J2 | Evidence Critic | Factual accuracy, evidence quality |
+| J3 | Devil's Advocate | Hidden assumptions, steelmanning |
+| J4 | Synthesis Judge | Narrative coherence across rounds |
+| J5 | Empirical Realist | Real-world plausibility |
 
-Use `--no-jury` and `--no-baseline` to reduce costs during development.
+**Key finding:** Jury (71%) outperforms single judge (68%) on medium-difficulty questions. Blind deliberation was critical — revealed-vote deliberation caused conformity cascades that hurt accuracy.
 
 ---
 

@@ -4,12 +4,11 @@ All hyperparameters are centralized here — nothing is hardcoded in other modul
 """
 
 # --- OpenAI API Settings ------------------------------------------------------
-# Set your key with:  export OPENAI_API_KEY='sk-...'
 OPENAI_BASE_URL = None   # None = use default OpenAI endpoint (api.openai.com)
 OPENAI_API_KEY  = None   # None = read from OPENAI_API_KEY environment variable
 
 # --- Model Settings -----------------------------------------------------------
-MODEL_NAME        = "gpt-4o-mini"   # Cheapest capable OpenAI model
+MODEL_NAME        = "gpt-4o-mini"
 TEMPERATURE       = 0.7             # Sampling temperature for debaters
 JUDGE_TEMPERATURE = 0.2             # Lower temp for deterministic judging
 MAX_TOKENS        = 2048            # Max tokens per LLM call
@@ -24,7 +23,6 @@ SELF_CONSISTENCY_N    = 5    # Number of samples for self-consistency baseline
 SELF_CONSISTENCY_TEMP = 0.8  # Higher temp for diverse sampling
 
 # --- Dataset Settings ---------------------------------------------------------
-DATASET_NAME  = "tau/commonsense_qa"  # HuggingFace dataset handle (fallback)
 STRATEGYQA_HF = "wics/strategy-qa"   # Primary StrategyQA handle
 NUM_QUESTIONS = 1                     # Questions to run in demo mode (set to 100+ for experiments)
 
