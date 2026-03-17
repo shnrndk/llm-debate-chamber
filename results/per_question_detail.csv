@@ -1,0 +1,101 @@
+qid,question,ground_truth,single_judge_verdict,single_judge_correct,single_judge_confidence,jury_verdict,jury_correct,jury_confidence,jury_difficulty,num_debate_rounds,early_stop,initial_consensus,chain_of_thought_pred,few_shot_pred,one_shot_pred,self_consistency_pred,zero_shot_pred,chain_of_thought_correct,few_shot_correct,one_shot_correct,self_consistency_correct,zero_shot_correct,all_methods_agree,methods_correct_count
+000275e7aa81e30885e7,Has numerology helped shape hotel layouts?,Yes,No,False,4,Yes,True,3.0,Medium,5,False,False,No,No,Yes,No,No,False,False,True,False,False,False,2/7
+026a34caa057f988a881,Was Michael Crichton ever in danger of flunking out of Harvard as an undergraduate?,No,No,True,4,No,True,3.2,Medium,5,False,False,No,Yes,Yes,No,Yes,True,False,False,True,False,False,4/7
+068379affae04debca2b,Did the Nepalese Civil War take place near India?,Yes,Yes,True,4,No,False,3.6,Medium,4,True,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,False,6/7
+0782cde19737531d14fe,Is University of Pittsburgh easier to enter than FBI?,Yes,Yes,True,4,No,False,3.8,Medium,5,False,False,Yes,No,Yes,Yes,Yes,True,False,True,True,True,False,5/7
+0e2f272f72871428cc90,Did Al Unser Jr. win the Space Race?,No,No,True,4,No,True,4.2,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+1051df8b6730dcd1b34f,Would a customer be happy if their grocery store meat tasted like game?,No,Yes,False,4,No,True,3.4,Medium,4,True,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+11714d45205c86d31910,Can the city of Miami fit inside Uppsala?,No,No,True,5,No,True,4.2,Easy,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+162458ca6672c642a00f,Did the leader of Heaven's Gate consider himself a prophet?,Yes,Yes,True,4,No,False,3.0,Medium,5,False,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,False,6/7
+1675495e9a3ed30329bd,Would a rabbi worship martyrs Ranavalona I killed?,No,No,True,4,No,True,3.6,Medium,3,True,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+1700bc2c9529a12bd026,Could you watch Naruto and Puzzle Place on the same channel?,No,No,True,4,No,True,4.2,Easy,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+17b8fa74f450c4d0e56b,Does Disney's Alice in Wonderland involve the celebration of a holiday?,Yes,Yes,True,4,No,False,3.4,Medium,3,True,False,No,No,No,No,No,False,False,False,False,False,False,1/7
+1857d2f86cc49c8eb728,Is euphoria associated with drug addiction?,Yes,Yes,True,4,Yes,True,4.0,Medium,5,False,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,True,7/7
+1eeb5b135e7120037e70,Is the United States the largest exporter of Fair Trade products?,No,No,True,4,No,True,4.0,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+1fe4d0d2911c40065b89,Could Johnny Carson's children fill out a water polo team?,No,No,True,4,No,True,3.8,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+24aa6050c1ed0405e663,Can Immersion Baptism lead to a death like Jeff Buckley's?,Yes,Yes,True,4,No,False,3.0,Medium,5,True,False,No,No,No,No,No,False,False,False,False,False,False,1/7
+28104d8b40e83617cd2a,Do quadragenarian's have little memory capacity?,No,Yes,False,4,Yes,False,3.8,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,False,5/7
+2c0ad6834e39382c2e4f,Is most coffee produced South of the Equator?,Yes,Yes,True,4,No,False,3.4,Medium,5,False,False,No,Yes,Yes,Yes,Yes,False,True,True,True,True,False,5/7
+2da278a3d315ec89e21c,Are right wing Amreicans opposed to marxism?,Yes,Yes,True,4,No,False,3.2,Medium,3,True,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,False,6/7
+2ed0dd0664d4583389bc,Does horseradish have a fetlock?,No,No,True,4,No,True,4.8,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+2fd3aa5d2672c8c5350c,Does The Doctor keep his ship in his childhood home?,No,No,True,4,No,True,3.8,Easy,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+3295844627a9bd1b9135,Was Harry Potter a better investment than The Matrix for Warner Bros.?,Yes,Yes,True,4,Yes,True,4.0,Easy,5,False,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,True,7/7
+32c562173099f5c2345f,Can a Goblin shark hypothetically ride a bike if it had limbs?,No,No,True,4,No,True,4.0,Easy,5,True,False,No,Yes,Yes,Yes,Yes,True,False,False,False,False,False,3/7
+3763c0523e44d02ff1e3,Do you have to put on glasses to read a QR code?,No,Yes,False,4,No,True,3.4,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+43302ebc930b722c112b,Does Osama bin Laden put a wafer on his tongue every Sunday?,No,No,True,4,No,True,4.0,Easy,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+43e781a9076ad3f1d415,Can Family of Barack Obama ride comfortably in 2020 Jaguar F Type?,No,No,True,4,No,True,4.2,Medium,3,True,False,No,Yes,Yes,No,No,True,False,False,True,True,False,5/7
+46a30058a6a81a3b08df,Do citizens of Cheshire sing La Marseillaise?,No,Yes,False,4,No,True,3.2,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+48628a79ac6d18460f36,Did Eric Clapton have similar taste in women to one of the Beatles?,Yes,Yes,True,4,No,False,4.0,Easy,5,False,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,False,6/7
+497c4922b0552d7c5693,Is Argon near Neon on the periodic table of elements?,Yes,Yes,True,4,Yes,True,4.0,Easy,3,True,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,True,7/7
+4a8361174e3f01cf8c2e,Was Achilles a direct descendent of Gaia?,Yes,No,False,4,No,False,4.0,Easy,5,False,False,No,No,No,No,No,False,False,False,False,False,True,0/7
+4ab77024b00c43ab7445,Could R. Kelly write a college thesis?,No,No,True,4,No,True,3.4,Medium,5,False,False,No,Yes,Yes,No,Yes,True,False,False,True,False,False,4/7
+4db6d375c79e86c2818e,Did Sony definitively win the video game war against Sega?,Yes,Yes,True,4,Yes,True,3.4,Medium,4,True,False,Yes,Yes,No,Yes,Yes,True,True,False,True,True,False,6/7
+4dd3a8a73cc4786cd638,Do storks need golden toads to survive?,No,Yes,False,4,Yes,False,4.0,Easy,3,True,False,No,No,No,No,No,True,True,True,True,True,False,5/7
+55bcf8e81e775bac5a4e,Did DARPA influence Albert Einstein?,No,No,True,4,No,True,3.2,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+56464972cc1e47ef8a66,Does Jerry Seinfeld hang out at the Budweiser Party Deck?,No,No,True,4,No,True,4.0,Easy,3,True,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+62239530032e5e88b8a7,Does an individual oceanographer study many sciences?,Yes,Yes,True,4,Yes,True,3.8,Medium,4,True,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,True,7/7
+694ac8d334fc4545ee31,Did Kurt Cobain's music genre survive after his death?,Yes,Yes,True,4,Yes,True,3.6,Medium,5,False,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,True,7/7
+69e0b6f868ee71314fc1,Does Marco Rubio have a close relationship with Allah?,No,No,True,4,No,True,4.0,Medium,3,True,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+6a8f77c62222517534f5,Was the father of social security system serving in the white house during the Panic of 1907?,No,No,True,4,No,True,4.4,Medium,5,False,False,No,No,Yes,No,No,True,True,False,True,True,False,6/7
+6ad52c1f34bebab2cbba,Was Muhammed a member of the Uniting Church in Australia?,No,No,True,5,No,True,4.8,Easy,0,False,True,No,No,No,No,No,True,True,True,True,True,True,7/7
+6ae9ff023bf054219f6f,Did Al-Farabi ever meet Mohammed?,No,No,True,5,No,True,4.6,Easy,4,True,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+721d168ff5cc0b18c31b,Can fish get Tonsillitis?,No,No,True,4,Yes,False,3.4,Medium,4,True,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+722dc38bd849d8b6ec0f,Are those incapable of reproduction incapable of parenthood?,No,No,True,4,No,True,3.6,Medium,4,True,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+7776349dede20a0d6405,Was Pope Alexander VI's origin country least represented in papal history?,No,Yes,False,4,No,True,3.2,Medium,5,False,False,No,No,Yes,No,No,True,True,False,True,True,False,5/7
+79af6e281b295c2a2e85,Can Simon Cowell vote for the next Supreme Court judge?,No,No,True,4,No,True,4.2,Easy,5,True,False,No,No,Yes,No,No,True,True,False,True,True,False,6/7
+7b75cf06f6fe3cdf08b4,Could a hamster experience two leap years?,No,Yes,False,4,No,True,3.4,Medium,5,False,False,No,Yes,Yes,No,Yes,True,False,False,True,False,False,3/7
+7b82cd99c7c68aa1b022,Are there Americans still enlisted in the Confederate States Army?,No,No,True,5,No,True,4.4,Easy,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+7bb579fa94d5f0d58ae1,Were Depeche Mode heavily influenced by blues music?,No,No,True,4,No,True,3.6,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+7daa137a9509cb6c211a,Is Cambodia too expensive for 2020 richest billionaire to own?,No,Yes,False,4,Yes,False,4.0,Easy,4,True,False,No,No,No,No,No,True,True,True,True,True,False,5/7
+8079e0f884664d724347,Do hornets provide meaningful data for oceanographers?,No,Yes,False,4,No,True,3.6,Medium,4,True,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+80ba3ad84b318f16f34c,Could you read The Atlantic magazine during the Games of the XXII Olympiad?,Yes,No,False,4,No,False,3.6,Medium,5,False,False,Yes,No,Yes,Yes,No,True,False,True,True,False,False,3/7
+85300febfe21ecdcc5b1,Would a Wolverine and a Lynx be hard to tell apart?,No,Yes,False,4,Yes,False,4.0,Easy,4,True,False,No,Yes,Yes,No,No,True,False,False,True,True,False,3/7
+85fc2b42b1fb20762db4,Did Amy Winehouse always perform live perfectly?,No,No,True,4,No,True,3.4,Medium,3,True,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+8c754ab507b269281c30,Was the Eiffel tower used as a symbol of the French Revolution?,No,No,True,4,No,True,3.6,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+8e03ed9fce31618b095a,Could all of the famous Apollo's hypothetically defeat all of the famous D'Artagnan's?,Yes,Yes,True,4,Yes,True,3.6,Medium,5,False,False,Yes,No,No,Yes,No,True,False,False,True,False,False,4/7
+8f12cd3797d27f250b00,Were plants crucial for The King of Rock'n Roll's snack with bananas?,Yes,Yes,True,4,Yes,True,4.0,Easy,4,True,False,Yes,No,Yes,Yes,No,True,False,True,True,False,False,5/7
+8f936e225ee1fe225f66,Would Shaggy and Redenbacher popcorn founder both raise hand during first name roll call?,Yes,No,False,4,No,False,3.8,Medium,5,False,False,Yes,No,Yes,Yes,No,True,False,True,True,False,False,3/7
+918f19d38c16251343fc,Was Subway involved in a pedophilia scandal?,Yes,Yes,True,4,No,False,3.4,Medium,5,False,False,No,Yes,Yes,Yes,Yes,False,True,True,True,True,False,5/7
+9224ee338a77834434c9,Can a quarter fit inside of a human kidney?,Yes,No,False,4,No,False,3.4,Medium,3,True,False,Yes,No,No,Yes,No,True,False,False,True,False,False,2/7
+93264708b0d600fb9650,Would a fungal life-form be threatened by a pigment from copper?,Yes,Yes,True,4,Yes,True,4.2,Easy,4,True,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,True,7/7
+9422300529f87f9917bf,Is Benjamin Franklin a prime candidate to have his statues removed by Black Lives Matter movement?,Yes,Yes,True,4,Yes,True,4.0,Easy,4,True,False,No,Yes,Yes,No,Yes,False,True,True,False,True,False,5/7
+946d0b97a56bbe7acca2,Are there any chives hypothetically good for battling vampires?,Yes,No,False,4,No,False,4.0,Medium,5,False,False,No,No,No,No,No,False,False,False,False,False,True,0/7
+9a923e94373f79fa80e5,Could you make the kitchen 'holy trinity' without celery?,No,Yes,False,4,No,True,3.4,Medium,4,True,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+9d279701351e38e0400f,Can United States Secretary of State do crimes in U.K. without being arrested?,Yes,Yes,True,4,Yes,True,3.4,Medium,5,False,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,True,7/7
+9d445747557bf9d8786e,Did Julia Roberts practice blast beats as a child?,No,No,True,4,No,True,4.0,Easy,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+a1a92c378396180e190c,Has a neanderthal ever served on the Supreme Court of the United States?,No,No,True,5,No,True,4.6,Easy,0,False,True,No,No,No,No,No,True,True,True,True,True,True,7/7
+a2272d539335ff78b429,Can Tame Impala's studio band play a proper game of Hot Potato?,No,Yes,False,4,No,True,3.2,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+a96d28e1221bfbcf50a9,Would an uninsured person be more likely than an insured person to decline a CT scan?,Yes,Yes,True,4,Yes,True,3.8,Medium,3,True,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,True,7/7
+a98478f4c66dea748297,Could Plato have agreed with the beliefs of Jainism?,Yes,No,False,4,No,False,3.8,Medium,5,False,False,No,No,Yes,No,No,False,False,True,False,False,False,1/7
+add18119b84e567fed05,Is the Joker in a healthy romantic relationship?,No,No,True,4,No,True,4.0,Easy,5,True,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+b59da272353e651cf2eb,Would a Bulgarian priest eat a four-course meal on Christmas Eve?,No,Yes,False,4,No,True,3.6,Medium,5,False,False,Yes,Yes,Yes,Yes,Yes,False,False,False,False,False,False,1/7
+b747938f597b09e43603,Did origin dynasty of Go precede Jia Sidao?,Yes,Yes,True,4,Yes,True,4.0,Easy,5,False,False,Yes,No,No,Yes,Yes,True,False,False,True,True,False,5/7
+b7c897e34556ecccbc47,Did Ice make people rich?,Yes,Yes,True,4,No,False,3.0,Medium,4,True,False,No,Yes,Yes,Yes,Yes,False,True,True,True,True,False,5/7
+b978c4051673fd21035b,Are Aldi's foods discounted due to being out of date?,No,Yes,False,4,Yes,False,4.0,Easy,5,False,False,No,No,No,No,No,True,True,True,True,True,False,5/7
+c03e06230ef966bacf58,Did Alice's Adventures in Wonderland inspire Macbeth?,No,Yes,False,4,No,True,3.4,Medium,5,True,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+c497b4a83bc55a840e6c,Are raw carrots better for maximizing vitamin A intake?,No,No,True,4,No,True,4.0,Medium,5,False,False,No,Yes,Yes,No,Yes,True,False,False,True,False,False,4/7
+c4a9e56df5b83e483769,Could modern Brazilian Navy have hypothetically turned the tide in Battle of Actium?,Yes,No,False,4,No,False,4.0,Easy,5,False,False,No,No,No,No,No,False,False,False,False,False,True,0/7
+c51fd5841358ded6eaec,Were the Ten commandments the part of the bible that Jewish people do not believe in?,No,No,True,4,Yes,False,3.2,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+c69a3eeea9743e782831,Do members of the Supreme Court of the United States have longer terms than most senators?,Yes,Yes,True,4,Yes,True,4.0,Medium,5,False,False,Yes,No,Yes,Yes,No,True,False,True,True,False,False,5/7
+ca1bbc7b71d286760acd,Do Australians ride Kangaroos to work?,No,No,True,4,No,True,4.6,Easy,5,True,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+cbc489c97e6797962787,Can a martyr saint have been excommunicated?,Yes,No,False,4,Yes,True,3.4,Medium,5,False,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,False,6/7
+cda85328c8825e86d3f0,Does Nintendo's link ever see an astronomer?,Yes,Yes,True,4,No,False,4.2,Medium,5,False,False,No,No,No,No,No,False,False,False,False,False,False,1/7
+cdc41c9bae19c441248d,Does Adam Sandler skip celebrating Easter?,Yes,Yes,True,4,Yes,True,4.0,Easy,3,True,False,Yes,No,Yes,No,No,True,False,True,False,False,False,4/7
+d03daae5b38423aec74c,Would a packed Wembley stadium be likely to have a descendant of the Mongols inside?,Yes,No,False,4,No,False,3.8,Medium,5,False,False,No,Yes,Yes,No,Yes,False,True,True,False,True,False,3/7
+d05b8ed82dbe1583b16c,Does a person need to be a parent to become a grandparent?,Yes,Yes,True,4,Yes,True,3.8,Medium,5,True,False,Yes,No,No,No,No,True,False,False,False,False,False,3/7
+d1c8f0835896d18c99c2,If Martin Luther did one theses a day would he run out in half a year?,Yes,Yes,True,4,Yes,True,4.6,Easy,5,False,False,No,No,Yes,No,No,False,False,True,False,False,False,3/7
+d47120efd0f09badd848,Is menthol associated with Christmas?,Yes,No,False,4,No,False,3.6,Medium,5,False,False,Yes,No,No,Yes,No,True,False,False,True,False,False,2/7
+d4803e3857fb8b51df5b,Does Fraktur have a sordid history?,Yes,Yes,True,4,Yes,True,4.0,Easy,5,False,False,Yes,Yes,Yes,Yes,Yes,True,True,True,True,True,True,7/7
+d7bac31bafedfe9de6ee,Can you order an Alfa Romeo at Starbucks?,No,No,True,4,No,True,4.0,Easy,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+d9b4f68792ef86249d18,Did Wednesday have something to do with Thor?,Yes,No,False,4,No,False,3.8,Medium,5,False,False,Yes,No,Yes,Yes,No,True,False,True,True,False,False,3/7
+db6ede282f42b088fef7,Would a sophist use an épée?,No,Yes,False,4,No,True,3.6,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+e12a00a2c45fcb4f38e7,Would Othello be Shakespeare's play to buy Scheherazade most time with king?,No,Yes,False,4,No,True,4.0,Easy,3,True,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+e26a5601edb90a738d56,Will Futurama surpass the number of episodes of The Simpsons by the end of 2020?,No,No,True,4,No,True,4.0,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+e48be839783682257024,Did Tony Bennett have more children than he had wives?,Yes,Yes,True,5,Yes,True,4.8,Easy,3,True,False,Yes,Yes,Yes,Yes,No,True,True,True,True,False,False,6/7
+e7730031d304759520ba,Was the Euro used in Prussia?,No,Yes,False,4,No,True,4.4,Medium,3,True,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+ebbf0b9ffffd08d812e5,Tata Hexa can accomodate every Spice Girl?,Yes,Yes,True,4,Yes,True,3.4,Medium,5,False,False,Yes,No,No,Yes,No,True,False,False,True,False,False,4/7
+ed91d5142b8037b07abb,Would lumberjacks get full after eating three dosa?,No,Yes,False,4,No,True,3.4,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+ee5be0cf3e643eb6b699,Can olive oil kill rabies?,No,No,True,4,No,True,4.2,Easy,5,False,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+f332153ae800b78d0959,Can you hide a basketball in a sand cat's ear?,No,No,True,5,No,True,4.6,Easy,3,True,False,No,No,No,No,No,True,True,True,True,True,True,7/7
+f4256dffd78da0d7fdf8,Do skeletons have hair?,No,Yes,False,4,No,True,4.2,Medium,5,False,False,No,No,No,No,No,True,True,True,True,True,False,6/7
+f4a336168f5165de7f0d,Is a northern fur seal needing emergency surgery in July likely a safe anesthesia candidate?,Yes,Yes,True,4,No,False,3.4,Medium,5,False,False,Yes,No,No,No,No,True,False,False,False,False,False,2/7
