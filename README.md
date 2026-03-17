@@ -7,6 +7,9 @@ A multi-agent debate system where two LLM agents argue opposing sides of a Strat
 
 📄 **[View Full Report](https://shnrndk.github.io/llm-debate-chamber/)** — Methodology, experiments, analysis, and prompt engineering
 
+
+ **[Live Preview](https://llm-debate-chamber.onrender.com)** - is hosted in https://llm-debate-chamber.onrender.com
+
 ---
 
 ## Results (100 questions, StrategyQA, gpt-4o-mini)
